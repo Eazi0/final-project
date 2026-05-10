@@ -1,0 +1,53 @@
+- hosts: web
+  become: yes
+
+  tasks:
+
+    - name: Update system packages
+      dnf:
+        name: '*'
+        state: latest
+
+    - name: Install Docker
+      dnf:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Install Git
+      dnf:
+        name: git
+        state: present
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Create symlink for docker-compose
+      file:
+        src: /usr/local/bin/docker-compose
+        dest: /usr/bin/docker-compose
+        state: link
+
+    - name: Clone repo
+      git:
+        repo: https://github.com/bloomytech/samplejavaapp.git
+        dest: /home/ec2-user/final-project
+
+    - name: Run Docker Compose
+      command: docker-compose up -d --build
+      args:
+        chdir: /home/ec2-user/final-project
