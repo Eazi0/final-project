@@ -6,7 +6,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://https://github.com/Eazi0/final-project.git'
+                git 'https://github.com/Eazi0/final-project.git'
             }
         }
 
